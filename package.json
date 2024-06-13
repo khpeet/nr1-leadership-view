@@ -1,0 +1,25 @@
+{
+    "private": true,
+    "name": "nr1-leadership-view",
+    "version": "0.1.0",
+    "scripts": {
+        "start": "nr1 nerdpack:serve",
+        "test": "exit 0"
+    },
+    "nr1": {
+        "uuid": "9bccd73d-9258-4bc5-b27f-cdf04d68ea60"
+    },
+    "dependencies": {
+      "lodash": "^4.17.21",
+      "prop-types": "15.7.2",
+      "react": "17.0.2",
+      "react-dom": "17.0.2",
+      "semantic-ui-css": "2.4.1",
+      "semantic-ui-react": "2.0.4"
+    },
+    "browserslist": [
+        "last 2 versions",
+        "not ie < 11",
+        "not dead"
+    ]
+}

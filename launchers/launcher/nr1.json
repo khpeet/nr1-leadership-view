@@ -1,0 +1,7 @@
+{
+  "schemaType": "LAUNCHER",
+  "id": "leadership-launcher",
+  "displayName": "Leadership View",
+  "description": "Executive friendly view of consolidated workload status",
+  "rootNerdletId": "leadership-nerdlet"
+}
