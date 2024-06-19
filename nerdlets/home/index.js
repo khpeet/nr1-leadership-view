@@ -79,20 +79,17 @@ export default class HomeNerdlet extends React.Component {
   //example function for sorting based on specific group values
   fetchGroupOrder(group) {
     switch (group) {
-      case 'FrontOffice':
-        return 0;
+      case 'Infrastructure':
+        return 3;
         break;
-      case 'ServiceIntegrationOrchestration':
+      case 'BackendServices':
+        return 2;
+        break;
+      case 'FrontendServices':
         return 1;
         break;
-      case 'BackOffice':
-        return 20;
-        break;
-      case 'Infrastructure':
-        return 22;
-        break;
       default:
-        return 21;
+        return 4;
         break;
     }
   }
