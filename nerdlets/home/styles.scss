@@ -1,1 +1,10 @@
 @import url('//cdn.jsdelivr.net/npm/semantic-ui@2.4.1/dist/semantic.min.css');
+
+.row {
+  display: flex
+}
+
+.column {
+  flex: 50%;
+  padding: 10px;
+}

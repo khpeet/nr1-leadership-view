@@ -1,6 +1,6 @@
 import React from 'react';
 import { navigation, nerdlet, NerdGraphQuery, Spinner } from 'nr1';
-import { Accordion,Button,Loader } from 'semantic-ui-react';
+import { Accordion, Button, Loader } from 'semantic-ui-react';
 import _ from 'lodash';
 import config from './config.json';
 
@@ -14,11 +14,13 @@ export default class HomeNerdlet extends React.Component {
       loading: true,
       workloads: [],
       groups: null,
+      groups2: null,
       refreshRate: 60000
     };
 
     this.parentWorkload = config.parentWorkloadGuid;
-    this.groupTag = config.groupByTag;
+    this.groupByParentTag = config.groupByParentTag;
+    this.groupByChildTag = config.groupByChildTag;
   }
 
   handleClick = (e, titleProps) => {
@@ -67,17 +69,10 @@ export default class HomeNerdlet extends React.Component {
         return this.getData(nextCursor);
       }
 
-      // let filtered = all.filter(e => {
-      //   const leadershipDash = e.target.entity.tags.find(tag => tag.key === 'LeadershipDashboard');
-      //   if (leadershipDash) {
-      //     const val = leadershipDash.values[0];
-      //     return val === "Yes"
-      //   }
-      // });
       let final = await this.formatData(all);
-      let sortedFinal = _.sortBy(final, ['index']);
+      //let sortedFinal = _.sortBy(final, ['index']);
 
-      this.setState({workloads: all, groups: sortedFinal});
+      this.setState({workloads: all, groups: final});
     }
   }
 
@@ -107,21 +102,37 @@ export default class HomeNerdlet extends React.Component {
     let groupArray = [];
 
     data.forEach(w => {
-      const groupTag = w.target.entity.tags.find(tag => tag.key === this.groupTag);
-      if (groupTag) {
-        const value = groupTag.values[0];
-        if (!group[value]) {
-          group[value] = [];
+      const groupTag = w.target.entity.tags.find(tag => tag.key === this.groupByParentTag)?.values[0];
+      const childGroupTag = w.target.entity.tags.find(tag => tag.key === this.groupByChildTag)?.values[0];
+
+      if (groupTag && childGroupTag) {
+        if (!group[groupTag]) {
+          group[groupTag] = {};
         }
-        group[value].push(w);
+        if (!group[groupTag][childGroupTag]) {
+          group[groupTag][childGroupTag] = [];
+        }
+        group[groupTag][childGroupTag].push(w);
       }
     })
 
-    const result = Object.entries(group).map(([groupTag, objects]) => ({
-      groupTag,
-      index: this.fetchGroupOrder(groupTag),
-      data: _.sortBy(objects, [obj => obj.target.entity.name.toLowerCase()])
-    }));
+    const result = [];
+
+    Object.entries(group).forEach(([groupTag, childGroups]) => {
+      const children = [];
+      Object.entries(childGroups).forEach(([childGroupTag, objects]) => {
+        children.push({
+          childGroupTag,
+          index: this.fetchGroupOrder(childGroupTag),
+          data: _.sortBy(objects, [obj => obj.target.entity.name.toLowerCase()])
+        });
+      });
+
+      result.push({
+        groupTag,
+        childGroups: children
+      });
+    });
 
     return result;
   }
@@ -150,28 +161,35 @@ export default class HomeNerdlet extends React.Component {
     let { activeIndex, workloads, groups } = this.state;
 
     return (
-      <>
+      <div class="row">
         {groups.map((g, i) => {
-          //let formattedGroupName = g.groupTag.replace(/([a-z])([A-Z])/g, '$1 $2');
           return (
-            <Accordion fluid styled>
-              <Accordion.Title
-                active={activeIndex}
-                index={i}
-              >
+            <div class="column">
               <h2>{g.groupTag}</h2>
-              </Accordion.Title>
-              <Accordion.Content active={activeIndex}>
-                {g.data.map(wl => {
-                  return (
-                    <Button onClick={() => navigation.openStackedEntity(wl.target.entity.guid)} size='big' style={{'marginBottom': '5px'}} color={this.getColor(wl.target.entity.alertSeverity)}>{wl.target.entity.name}</Button>
-                  )
-                })}
-              </Accordion.Content>
-            </Accordion>
+              {g.childGroups.map((cg, i) => {
+                let formattedGroupName = cg.childGroupTag.replace(/([a-z])([A-Z])/g, '$1 $2');
+                return (
+                  <Accordion fluid styled>
+                    <Accordion.Title
+                      active={activeIndex}
+                      index={i}
+                    >
+                    <h3>{formattedGroupName}</h3>
+                    </Accordion.Title>
+                    <Accordion.Content active={activeIndex}>
+                      {cg.data.map(wl => {
+                        return (
+                          <Button onClick={() => navigation.openStackedEntity(wl.target.entity.guid)} size='big' style={{'marginBottom': '5px'}} color={this.getColor(wl.target.entity.alertSeverity)}>{wl.target.entity.name}</Button>
+                        )
+                      })}
+                    </Accordion.Content>
+                  </Accordion>
+                )
+              })}
+            </div>
           )
         })}
-      </>
+      </div>
     )
   }
 

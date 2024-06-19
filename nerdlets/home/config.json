@@ -1,4 +1,5 @@
 {
-  "parentWorkloadGuid": "<guid>",
-  "groupByTag": "<tag>"
+  "parentWorkloadGuid": "MTA5MTg5NnxOUjF8V09SS0xPQUR8MjI5NDkz",
+  "groupByParentTag": "BU",
+  "groupByChildTag": "HorizonTech"
 }
