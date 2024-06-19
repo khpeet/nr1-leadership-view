@@ -127,7 +127,7 @@ export default class HomeNerdlet extends React.Component {
 
       result.push({
         groupTag,
-        childGroups: children
+        childGroups: _.sortBy(children, ['index'])
       });
     });
 
